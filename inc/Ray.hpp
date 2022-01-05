@@ -11,9 +11,10 @@ public:
   auto getDirection() const {
     return direction;
   }
-  auto at(const double t) {
+  auto at(const double t) const {
     return origin + direction * t;
   }
+
 private:
   Vec3 origin;
   Vec3 direction;

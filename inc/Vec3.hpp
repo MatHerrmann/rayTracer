@@ -53,6 +53,10 @@ public:
     return x * rhs.x + y * rhs.y + z * rhs.z;
   }
 
+  static Vec3 normalize(const Vec3& v) {
+    return v / v.getLength();
+  }
+
 private:
 
   double x;

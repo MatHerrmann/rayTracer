@@ -4,7 +4,7 @@
 
 using Color = Vec3;
 
-bool hitSphere(const Vec3& centerSphere, double radius, const Ray& ray) {
+double hitSphere(const Vec3& centerSphere, double radius, const Ray& ray) {
   const auto direction = ray.getDirection();
   const auto origin = ray.getOrigin();
   const auto a = direction.dot(direction);
@@ -12,18 +12,32 @@ bool hitSphere(const Vec3& centerSphere, double radius, const Ray& ray) {
   const auto b = 2 * direction.dot(temp);
   const auto c = temp.dot(temp) - radius * radius;
   const auto discriminant = b * b - 4 * a * c;
-  return (discriminant > 0);
+  if (discriminant < 0) {
+    return -1.0;
+  } else {
+    return (-b - sqrt(discriminant)) / (2.0 * a);
+  }
 }
 
 Color rayColor(const Ray& ray) {
-  if (hitSphere(Vec3(1, 0, -1), 0.25, ray)) {
-    return Color(1, 0, 0);
+  const auto centerSphere = Vec3(0, 0, -1);
+  constexpr auto radius = 0.25;
+  auto t = hitSphere(centerSphere, radius, ray);
+  if (t > 0.0) {
+    const auto N = ray.at(t);
+    const auto N_normalized = Vec3::normalize(N);
+    return Color(N_normalized.getX() + 1, N_normalized.getY() + 1, N_normalized.getZ() + 1);
+    // const auto distance = (N.getZ() - ray.getOrigin().getZ()) / (centerSphere.getZ() - radius);
+    // return Color(1.0, 1.0, 1.0) * (1.0 - distance) + Color(0.1, 0.2, 1.0) * distance;
+    // return Color(N_normalized.getX() + 1, N_normalized.getY() + 1, N_normalized.getZ() + 1);
   }
-  const auto direction = ray.getDirection();
-  const auto t = 0.5 * (direction.getY() + 1.0);
+
+  const auto dir = ray.getDirection();
+  const auto dir_normalized = Vec3::normalize(dir);
+  t = 0.5 * (dir_normalized.getY() + 1.0);
   // Erzeugt linearen Übergang zwischen
   //              Startwert                          Endwert
-  return Color(1.0, 1.0, 1.0) * (1.0 - t) + Color(0.8, 0.7, 1.0) * t;
+  return Color(1.0, 1.0, 1.0) * (1.0 - t) + Color(0.5, 0.7, 1.0) * t;
 
 }
 void writeColor(std::ostream& os, const Color& color) {
